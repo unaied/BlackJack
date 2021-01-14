@@ -1,0 +1,306 @@
+import random
+
+suits = ('Hearts', 'Diamonds', 'Spades', 'Clubs')
+ranks = ('Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Jack', 'Queen', 'King', 'Ace')
+values = {'Two':2, 'Three':3, 'Four':4, 'Five':5, 'Six':6, 'Seven':7, 'Eight':8, 
+            'Nine':9, 'Ten':10, 'Jack':10, 'Queen':10, 'King':10, 'Ace':11}
+
+# Remember ACE can be 1 or 11 - NEED TO CHANGE THIS 
+
+class Card:       ## Initiate card class
+    
+    def __init__(self,suit,rank):      ## Initiate 
+        self.suit = suit
+        self.rank = rank
+        self.value = values[rank]
+    
+    def __str__(self):                 ## method to return rand of suit
+        return self.rank + ' of ' + self.suit
+    
+
+class Deck:    
+    
+    def __init__(self):    ## setup deck - this only happens once upon creation of a new Deck
+        self.all_cards = [] 
+        for suit in suits:
+            for rank in ranks:
+                self.all_cards.append(Card(suit,rank))
+
+    def shuffle(self):     ## random shuffle of cards
+        random.shuffle(self.all_cards) 
+    
+    def __str__(self):     ## Function to print 
+        return self.rank + ' of ' + self.suit
+
+
+class Player:
+    
+
+    
+    def __init__(self, player, balance=0):      ## Setup player
+        # A new player has no cards
+        self.player = player
+        self.balance = balance
+        
+    def __str__(self):
+        return f'Player:   {self.player}\n Balance:  ${self.balance}'
+        
+    def bet(self):         ## player places bet
+        
+        bet_success = False
+        print("DID THIS WORK..........")
+        print(self.balance)
+
+        
+        while bet_success == False and self.balance > 0:
+            print("____")
+            
+            global bet_amt
+            global dealers_bank
+            
+            
+            bet_amt = int(input("How much would you like to bet?"))
+
+            if self.balance >= bet_amt and bet_amt > 0:
+                self.balance -= bet_amt
+                print('Bet Accepted')
+                print('Bet Amount: $', bet_amt)
+                print(f'Player balance: ${self.balance}')  
+                print(f'Dealers balance: ${dealers_bank}')  
+                bet_sucess = True
+                break
+                
+            elif bet_amt <= 0:
+                print('Your bet needs to be more than $0')
+                print(f'Player balance: ${self.balance}')
+                pass
+            
+            else:
+                print('Funds Unavailable!')
+                print(f'Player balance: ${self.balance}')
+                pass  
+            
+    def hit_or_stay(self):         ## Hit or Stay       
+        hit = '0'
+        
+        while hit == '0':
+            hit_o_stay = input("Hit(0) or Stay(1)?")
+            if hit_o_stay == '0': 
+                Dealer.single_deal(self)
+                if value_player > 21:
+                    self.bust()
+                    break
+                else:
+                    pass
+                
+            elif hit_o_stay == '1':
+                print("STAY......\n")
+                hit = '1'
+                pass
+                
+            else:
+                print('Please input 0 for Hit or 1 for Stay')
+                pass
+            
+                           
+    def bust(self):              ## Player Bust      
+        print("YOU ARE BUST")
+        global dealers_bank
+        global player_bust
+        player_bust = 1
+        
+        dealers_bank += bet_amt 
+        print(f"Player's balance: ${self.balance}")
+        print(f"Dealers's balance: ${dealers_bank}")
+        
+    def print_balance(self):
+        return self.balance
+    
+    def player_wins(self):
+        return self.balance + (bet_amt*2)
+    
+    def player_loses(self):
+        return self.balance - bet_amt
+
+
+class Dealer(Player):
+    
+    def __init__(self):      ## initiate dealer
+        super().__init__(player, balance)
+        pass
+        
+    def deal(self):           ## Deal two cards to each entity  
+        for x in range(2):
+            deck = my_deck.all_cards
+            dealt_card_p = deck.pop(-1)
+            players_cards.append(dealt_card_p)
+            
+            deck = my_deck.all_cards
+            dealt_card_d = deck.pop(-1)
+            dealers_cards.append(dealt_card_d)
+            
+        global value_player
+        global value_dealer
+        
+        print("__________________________________________________________\n")
+        
+        print("Dealers Cards:   ")
+        print("-----------------")
+        print("************")
+        
+        for x in range((len(dealers_cards))): 
+            value_dealer += values[dealers_cards[x].rank]
+        print (dealers_cards[0])    
+        
+        print('\n')
+        
+        print("Players Cards:   ")
+        print("-----------------")        
+        for x in range(len(players_cards)):
+            print (players_cards[x])
+            value_player += values[players_cards[x].rank]
+            
+        print('')    
+        print(f'The value of the player cards: {value_player}')      ###### COULD BE A PROBLEM HERE
+        print('')    
+                
+    def single_deal(self):             ## Deal single card to player
+        global value_player
+        deck = my_deck.all_cards
+        dealt_card_p = deck.pop(-1)
+        players_cards.append(dealt_card_p)
+        print("Players Cards:   ")
+        
+        for x in range(len(players_cards)):
+            print(players_cards[x])
+            
+        value_player += values[dealt_card_p.rank]   
+        print(f'The value of the players cards: {value_player}')             
+        pass
+    
+    def play(self):                 ## Dealer plays
+        print(f'The value of the dealers cards are {value_dealer}')
+        print("Dealers Cards:   ")
+        
+        for x in range(len(dealers_cards)):
+            print(dealers_cards[x])
+            print("\n")
+            
+        if value_dealer < 15:
+            self.hit_or_stay()
+            if value_dealer > 21:
+                self.bust()
+                pass
+        elif value_dealer > 21:
+            self.bust()
+            pass
+        else:
+            pass
+            
+    def hit_or_stay(self):           ## while value_dealer is less than 15 repeat single card deal call
+        while value_dealer < 15:
+            self.d_single_deal()
+                       
+    def d_single_deal(self):        ## single card deal to dealer
+        global value_dealer
+        deck = my_deck.all_cards
+        dealt_card_d = deck.pop(-1)
+        dealers_cards.append(dealt_card_d)
+        
+        print("Dealers Cards:   ")
+        for x in range((len(dealers_cards))):
+            print(dealers_cards[x])
+            
+        value_dealer += values[dealt_card_d.rank]
+   
+        print(f'The value of the Dealers cards: {value_dealer}')             
+        pass  
+
+    
+    
+    def bust(self):            ## Dealer bust  
+        print("THE DEALER IS BUST")
+        global dealers_bank
+        global dealer_bust
+        dealer_bust = 1
+        
+        dealers_bank -= bet_amt
+        self.balance += bet_amt
+        print(f"Player's balance: ${self.balance}")
+        print(f"Dealers's balance: ${dealers_bank}")
+        
+
+
+
+
+
+
+
+
+from IPython.display import clear_output
+
+####### GAME PLAY
+
+print("Welcome to our BLACK-JACK Table\n")
+    
+player = input("Enter your full name:        ")   
+balance =int(input("Enter the amount you would like to place on the table?  "))
+    
+my_player = Player(player, balance)     ## setup name
+print('\n', my_player)
+
+
+game_on = True
+dealers_bank = 100
+
+while game_on:
+    
+#    clear_output()               ## Clear screen
+#    display()                    ## Clear screen
+    
+    my_deck = Deck()              ## Setup up cards
+    my_deck.shuffle()            ## random Shuffle cards
+    players_cards = []           ## create empty list for players cards
+    dealers_cards = []           ## create empty list for dealers cards
+    value_player = 0             ## initiate value of players cards to 0
+    value_dealer = 0             ## initiate value of dealers cards to 0
+    player_bust = 0              ## initiatie player_bust to 0
+    dealer_bust = 0              ## initiatie dealer_bust to 0          
+            
+    my_dealer = Dealer()         ## initiate dealer
+    my_dealer.bet()
+    print("END OF LOOP")
+    my_dealer.deal()             ## Deal two cards to each and update value of cards in value_player and value_dealer
+    
+    my_player.hit_or_stay()      # Player chooses to hit or stay, if hit and reaches > 21 then bust
+
+######     if player_bust == 1 or dealer_bust == 1:
+######        print("BUST********************")
+    
+    my_dealer.play()
+    
+    print(value_dealer)
+    print(value_player)
+    print(my_player.print_balance())
+    print(dealers_bank)
+   
+    
+    if player_bust == 0 and dealer_bust == 0:
+        if value_player > value_dealer:
+            print("Player wins hand")
+######             p_total = my_player.print_balance() + (bet_amt*2)
+            dealers_bank -= bet_amt
+            print(f'PLAYERS TOTAL IN THE BANK {my_player.player_wins()}')
+            print(f'DEALERS TOTAL IN THE BANK {dealers_bank}')
+            
+        else:
+            print("Dealer wins hand")
+######             p_total = my_player.print_balance()
+            dealers_bank += bet_amt
+            print(f'PLAYERS TOTAL IN THE BANK {my_player.player_loses()}')
+            print(f'DEALERS TOTAL IN THE BANK {dealers_bank}')
+    else:
+        pass
+
+    
+    
